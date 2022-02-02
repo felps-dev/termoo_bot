@@ -22,8 +22,8 @@ with open("palavras_filtradas.txt", "r", encoding="UTF-8") as a_file:
 
 def update_status():
     width, height = pyautogui.size()
-    box = (width / 2 - (width * 0.10), height / 2 -
-           (height * 0.3), width / 2 + 250,  height / 2 + 260)
+    box = (width / 2 - 250, height / 2 - 330,
+           width / 2 + 250,  height / 2 + 260)
     image = ImageGrab.grab(box)
     resultado = []
     for x in coordinates:
@@ -44,9 +44,6 @@ def update_status():
 
 def get_words(word, status, allowed_words, negated_words):
     for index, letter in enumerate(word):
-        # print(status)
-        # print(status[index])
-        # print(letter)
         if(status[index] in [0]):
             negated_words.append(letter)
         elif(status[index] in [1, 2]):
