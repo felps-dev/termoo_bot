@@ -8,9 +8,7 @@
 
 ## Intro
 
-### Este bot irá ler o centro da sua tela e tentar encontrar o jogo, ao conseguir ele irá escolher
-
-### entre 9 palavras padrão e através delas tentar adivinhar quais são as próximas
+### Este bot irá ler o centro da sua tela e tentar encontrar o jogo, ao conseguir ele irá escolher entre 9 palavras padrão e através delas tentar adivinhar quais são as próximas
 
 ## Requisitos:
 
