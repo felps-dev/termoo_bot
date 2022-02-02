@@ -98,7 +98,7 @@ great_words = ['BOMBA', 'FOLHA', 'PILHA',
                'HIATO',
                'SINTO',
                'TIGRE',
-               'CESTA']
+               'CESTA', 'ROSEA', 'MELAO']
 i_win = False
 for tries in [0, 1, 2, 3, 4, 5]:
     result_ok = False
