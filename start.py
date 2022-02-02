@@ -1,5 +1,5 @@
 from distutils.sysconfig import PREFIX
-from PIL import ImageGrab, ImageOps
+from PIL import ImageGrab
 import pyautogui
 import time
 import random
