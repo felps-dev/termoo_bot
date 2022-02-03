@@ -1,4 +1,3 @@
-from distutils.sysconfig import PREFIX
 from PIL import ImageGrab
 import pyautogui
 import time
@@ -25,6 +24,8 @@ def update_status():
     box = (width / 2 - 250, height / 2 - 330,
            width / 2 + 250,  height / 2 + 260)
     image = ImageGrab.grab(box)
+    if(image.getpixel(coordinates[0][0]) == (49, 43, 45)):
+        return None
     resultado = []
     for x in coordinates:
         temp = []
@@ -45,24 +46,34 @@ def update_status():
 def get_words(word, status, allowed_words, negated_words):
     for index, letter in enumerate(word):
         if(status[index] in [0]):
-            negated_words.append(letter)
+            if(not letter in negated_words):
+                negated_words.append(letter)
         elif(status[index] in [1, 2]):
-            allowed_words.append(letter)
+            if(not letter in allowed_words):
+                allowed_words.append(letter)
     return allowed_words, negated_words
 
 
-def get_chances(last_line, word, list, allowed_words, negated_words, has_green):
+def get_chances(last_line, word, list, allowed_words, negated_words, has_green, alread_tried):
     # Primeiro filtra todas as palavras que podem
     # ser possíveis, ou seja, possuem
     almost = []
     for g_word in list:
         allow = False
+        if(g_word in alread_tried):
+            continue
         for cha in g_word:
             if(cha in negated_words):
                 if(cha not in allowed_words):
                     allow = False
                     break
             allow = True
+        for alw in allowed_words:
+            if(alw in g_word):
+                continue
+            else:
+                allow = False
+                break
         if(allow):
             almost.append(g_word)
     certain = []
@@ -99,29 +110,37 @@ great_words = ['BOMBA', 'FOLHA', 'PILHA',
                'SINTO',
                'TIGRE',
                'CESTA', 'ROSEA', 'MELAO']
+alread_tried = []
 i_win = False
 for tries in [0, 1, 2, 3, 4, 5]:
     result_ok = False
     print('Tentativa ' + str(tries))
     while not result_ok:
+        if(resultado is None):
+            i_win = True
+            break
         pyautogui.press(['backspace', 'backspace',
                         'backspace', 'backspace', 'backspace'], interval=0.08)
         if(tries == 0):
             test_word = random.choice(great_words)
         else:
-            test_word = random.choice(filtered_list)
+            while(test_word in alread_tried):
+                test_word = random.choice(filtered_list)
+
         pyautogui.write(test_word, interval=0.08)
         pyautogui.press('enter')
-        time.sleep(3)
+        time.sleep(2)
         resultado = update_status()
         result_ok = 3 not in resultado[tries] or tries == 5
         has_green = 1 in resultado[tries]
         i_win = resultado[tries] == [1, 1, 1, 1, 1]
-    allowed_words, negated_words = get_words(
-        test_word, resultado[tries], allowed_words, negated_words)
-    filtered_list = get_chances(
-        resultado[tries], test_word, filtered_list, allowed_words, negated_words, has_green)
-    print('Possibilidades: ' + str(len(filtered_list)))
+        alread_tried.append(test_word)
     if(i_win):
         print('Consegui!')
         break
+    else:
+        allowed_words, negated_words = get_words(
+            test_word, resultado[tries], allowed_words, negated_words)
+        filtered_list = get_chances(
+            resultado[tries], test_word, filtered_list, allowed_words, negated_words, has_green, alread_tried)
+        print('Possibilidades: ' + str(len(filtered_list)))
