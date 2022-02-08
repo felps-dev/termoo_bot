@@ -14,6 +14,45 @@ coordinates = [
 
 word_list = []
 
+letter_priority = {
+    'A': 54.63,
+    'B': 1.04,
+    'C': 3.88,
+    'D': 4.99,
+    'E': 52.57,
+    'F': 1.02,
+    'G': 1.30,
+    'H': 1.28,
+    'I': 56.18,
+    'J': 0.40,
+    'K': 0.02,
+    'L': 2.78,
+    'M': 4.74,
+    'N': 5.05,
+    'O': 50.73,
+    'P': 2.52,
+    'Q': 1.20,
+    'R': 6.53,
+    'S': 7.81,
+    'T': 4.34,
+    'U': 54.63,
+    'V': 30.67,
+    'W': 0.01,
+    'X': 0.21,
+    'Y': 0.01,
+    'Z': 0.47,
+}
+
+great_words = ['BOMBA', 'FOLHA', 'PILHA',
+               'DACIO',
+               'BROCA',
+               'HIATO',
+               'SINTO',
+               'TIGRE',
+               'CESTA', 'ROSEA', 'MELAO']
+
+consoantes = 'BCÇDFGHJKLMNPQRSTV'
+
 with open("palavras_filtradas.txt", "r", encoding="UTF-8") as a_file:
     for line in a_file:
         word_list.append(line.strip())
@@ -77,6 +116,8 @@ def get_chances(last_line, word, list, allowed_words, negated_words, has_green, 
         if(allow):
             almost.append(g_word)
     certain = []
+    # Filtra as palavras que possuem as letras exatamente
+    # nos espaços verdes
     if(not has_green):
         certain = almost
     else:
@@ -84,6 +125,7 @@ def get_chances(last_line, word, list, allowed_words, negated_words, has_green, 
             allow = False
             for index, cha in enumerate(g_word):
                 if(last_line[index] == 1):
+                    # Letra exatamente no espaço verde.
                     if(cha == word[index]):
                         allow = True
                     else:
@@ -91,6 +133,18 @@ def get_chances(last_line, word, list, allowed_words, negated_words, has_green, 
                         break
             if(allow):
                 certain.append(g_word)
+
+    # Filtra as palavras por ordem de prioridade das letras.
+    def get_sum_qulity(w):
+        sum = 0
+        for cha in w:
+            sum += letter_priority[cha]
+            sum += 50 if cha in consoantes else 0
+            sum -= 300 if w.count(cha) > 2 else 0
+        sum -= 300 if w[3] == 'A' and w[4] == 'O' else 0
+        return sum
+
+    certain.sort(reverse=True, key=get_sum_qulity)
     return certain
 
 
@@ -103,13 +157,6 @@ filtered_list = word_list
 allowed_words = []
 negated_words = []
 has_green = False
-great_words = ['BOMBA', 'FOLHA', 'PILHA',
-               'DACIO',
-               'BROCA',
-               'HIATO',
-               'SINTO',
-               'TIGRE',
-               'CESTA', 'ROSEA', 'MELAO']
 alread_tried = []
 i_win = False
 for tries in [0, 1, 2, 3, 4, 5]:
@@ -124,8 +171,11 @@ for tries in [0, 1, 2, 3, 4, 5]:
         if(tries == 0):
             test_word = random.choice(great_words)
         else:
+            w_tries = 0
             while(test_word in alread_tried):
-                test_word = random.choice(filtered_list)
+                # Pega a primeira da lista filtrada
+                test_word = filtered_list[0 + w_tries]
+                w_tries += 1
 
         pyautogui.write(test_word, interval=0.08)
         pyautogui.press('enter')
@@ -143,4 +193,5 @@ for tries in [0, 1, 2, 3, 4, 5]:
             test_word, resultado[tries], allowed_words, negated_words)
         filtered_list = get_chances(
             resultado[tries], test_word, filtered_list, allowed_words, negated_words, has_green, alread_tried)
+        # print(filtered_list)
         print('Possibilidades: ' + str(len(filtered_list)))

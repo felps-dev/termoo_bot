@@ -1,9 +1,9 @@
 from unidecode import unidecode
 
-with open("palavras.txt", "r", encoding="UTF-8") as a_file:
+with open("palavrasnovas.txt", "r", encoding="UTF-8") as a_file:
     final_file = []
     for line in a_file:
-        stripped_line = line.strip().replace('.', '')
+        stripped_line = line.strip().replace('.', '').replace("'", '').replace("-", '')
         if(len(stripped_line) == 5):
             final_file.append(unidecode(stripped_line.upper()))
 
